@@ -28,13 +28,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        readJson();
+        parseJSON();
     }
 
     public void readJson() {
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(
-                    new InputStreamReader(getAssets().open("filename.txt")));
+                    new InputStreamReader(getAssets().open("FacebookJSON")));
             // do reading, usually loop until end of file reading
             String mLine;
             while ((mLine = reader.readLine()) != null) {
@@ -59,41 +61,41 @@ public class MainActivity extends AppCompatActivity {
         JSONArray jsonArray = new JSONArray();
         ArrayList<FacebookModel>facebookModelArrayList = new ArrayList<>();
 
+        try {
 
-        for(int i= 0 ; i<jsonArray.length(); i++){
-            FacebookModel facebookModelobject = new FacebookModel();
-            try{
-            JSONObject jsonRealObject = jsonArray.getJSONObject(i);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                FacebookModel facebookModelObject = new FacebookModel();
 
-                facebookModelobject.setId(jsonRealObject.getString("id"));
-                facebookModelobject.setMessage(jsonRealObject.getString("message"));
-                facebookModelobject.setType(jsonRealObject.getString("type"));
-                facebookModelobject.setCreated_time(jsonRealObject.getString("created_time"));
-                facebookModelobject.setUpdated_time(jsonRealObject.getString("updated_time"));
-                ArrayList<FromModel>fromModel = new ArrayList<>();
+                JSONObject jsonRealObject = jsonArray.getJSONObject(i);
 
+                facebookModelObject.setId(jsonRealObject.getString("id"));
+                facebookModelObject.setMessage(jsonRealObject.getString("message"));
+                facebookModelObject.setType(jsonRealObject.getString("type"));
+                facebookModelObject.setCreated_time(jsonRealObject.getString("created_time"));
+                facebookModelObject.setUpdated_time(jsonRealObject.getString("updated_time"));
+                ArrayList<FromModel> fromModel = new ArrayList<>();
                 FromModel fromModel1 = new FromModel();
-                ArrayList<FromModel>fromList = new ArrayList<>();
+                ArrayList<FromModel> fromList = new ArrayList<>();
 
-                for (int j=0; i<jsonRealObject.getJSONObject("from").length();j++ )
-                    {
-                        JSONObject fromObject = jsonRealObject.getJSONObject("name").getJSONObject(String.valueOf(j));
-                        fromModel1.setName(jsonRealObject.getString("name"));
-                        fromModel1.setId(jsonRealObject.getString("id"));
-                    }
+                for (int j = 0; i < jsonRealObject.getJSONObject("from").length(); j++) {
+                    JSONObject fromObject = jsonRealObject.getJSONObject("name").getJSONObject(String.valueOf(j));
+                    fromModel1.setName(jsonRealObject.getString("name"));
+                    fromModel1.setId(jsonRealObject.getString("id"));
+                }
                 ActionsModel actionsModel = new ActionsModel();
-                ArrayList<ActionsModel>actionList = new ArrayList<>();
-                for (int k=0; i<jsonRealObject.getJSONObject("from").length();k++ ){
-                        JSONObject actionsObject = jsonRealObject.getJSONArray("actions").getJSONObject(k);
-                        actionsModel.setName(jsonRealObject.getString("name"));
-                        actionsModel.setLink(jsonRealObject.getString("link"));
+                ArrayList<ActionsModel> actionList = new ArrayList<>();
+                for (int k = 0; i < jsonRealObject.getJSONObject("from").length(); k++) {
+                    JSONObject actionsObject = jsonRealObject.getJSONArray("actions").getJSONObject(k);
+                    actionsModel.setName(jsonRealObject.getString("name"));
+                    actionsModel.setLink(jsonRealObject.getString("link"));
                 }
 
-                facebookModelobject.setActionsModel(actionList);
-                facebookModelobject.setFromModel(fromList);
-                facebookModelArrayList.add(facebookModelobject);
-                Log.i("Array" , facebookModelArrayList.toString());
+                facebookModelObject.setActionsModel(actionList);
+                facebookModelObject.setFromModel(fromList);
+                facebookModelArrayList.add(facebookModelObject);
+                Log.i("Array", facebookModelArrayList.toString());
 
+            }
         }
         catch (JSONException e){
             e.printStackTrace();
@@ -101,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
     }
-}
+
 
 
 
