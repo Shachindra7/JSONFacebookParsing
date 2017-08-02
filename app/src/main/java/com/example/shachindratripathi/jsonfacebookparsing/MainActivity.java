@@ -2,6 +2,7 @@ package com.example.shachindratripathi.jsonfacebookparsing;
 
 import android.content.res.AssetManager;
 import android.content.res.ColorStateList;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,19 +29,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        readJson();
+        readJsonFromAssets();
         parseJSON();
     }
 
-    public void readJson() {
+    @NonNull
+    StringBuilder builder = new StringBuilder();
+    private String readJsonFromAssets(){
         BufferedReader reader = null;
+
         try {
+           /* reader = new BufferedReader(
+                    new InputStreamReader(getAssets().open("spa_dummy_data.txt")));*/
             reader = new BufferedReader(
-                    new InputStreamReader(getAssets().open("FacebookJSON")));
+                    new InputStreamReader(getResources().openRawResource(R.raw.facebookjson)));
+
             // do reading, usually loop until end of file reading
             String mLine;
             while ((mLine = reader.readLine()) != null) {
                 //process line
+                builder.append(mLine);
             }
         } catch (IOException e) {
             //log the exception
@@ -53,15 +61,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+
+        return builder.toString();
     }
     private void parseJSON(){
 
-        StringBuilder stringBuilder = new StringBuilder();
-        JSONObject jsonObject = new  JSONObject();
-        JSONArray jsonArray = new JSONArray();
-        ArrayList<FacebookModel>facebookModelArrayList = new ArrayList<>();
+        try{
 
-        try {
+        JSONObject jsonObject = new  JSONObject(String.valueOf(builder));
+        JSONArray jsonArray = jsonObject.getJSONArray("data");
+        ArrayList<FacebookModel>facebookModelArrayList = new ArrayList<>();
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 FacebookModel facebookModelObject = new FacebookModel();
@@ -73,18 +82,16 @@ public class MainActivity extends AppCompatActivity {
                 facebookModelObject.setType(jsonRealObject.getString("type"));
                 facebookModelObject.setCreated_time(jsonRealObject.getString("created_time"));
                 facebookModelObject.setUpdated_time(jsonRealObject.getString("updated_time"));
-                ArrayList<FromModel> fromModel = new ArrayList<>();
-                FromModel fromModel1 = new FromModel();
-                ArrayList<FromModel> fromList = new ArrayList<>();
 
-                for (int j = 0; i < jsonRealObject.getJSONObject("from").length(); j++) {
-                    JSONObject fromObject = jsonRealObject.getJSONObject("name").getJSONObject(String.valueOf(j));
-                    fromModel1.setName(jsonRealObject.getString("name"));
-                    fromModel1.setId(jsonRealObject.getString("id"));
-                }
+                ArrayList<FromModel> fromList = new ArrayList<>();
+                FromModel fromModel = new FromModel();
+                JSONObject jsonFromRealObject = jsonArray.getJSONObject(i);
+                fromModel.setName(jsonFromRealObject.getString("name"));
+                fromModel.setId(jsonFromRealObject.getString("id"));
+
                 ActionsModel actionsModel = new ActionsModel();
                 ArrayList<ActionsModel> actionList = new ArrayList<>();
-                for (int k = 0; i < jsonRealObject.getJSONObject("from").length(); k++) {
+                for (int k = 0; i < jsonRealObject.getJSONArray("actions").length(); k++) {
                     JSONObject actionsObject = jsonRealObject.getJSONArray("actions").getJSONObject(k);
                     actionsModel.setName(jsonRealObject.getString("name"));
                     actionsModel.setLink(jsonRealObject.getString("link"));
@@ -98,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         catch (JSONException e){
+
             e.printStackTrace();
         }
 
